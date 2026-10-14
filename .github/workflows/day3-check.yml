@@ -1,4 +1,3 @@
-```yaml
 name: Day3 Backend Check
 
 'on':
@@ -44,4 +43,3 @@ jobs:
 
       - name: Complete check
         run: echo "PASS: Day3 Backend Check completed"
-```
