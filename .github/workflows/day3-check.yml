@@ -1,20 +1,23 @@
 name: Day3 Backend Check
 
-on: push
+on:
+  push:
 
 jobs:
   check:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt
 
       - name: Check project structure
         run: |
@@ -25,16 +28,19 @@ jobs:
           test -f routes/events.py
           test -f routes/registrations.py
           test -f utils/auth_helpers.py
+          test -f utils/accessibility.py
 
       - name: Check security helpers
         run: |
-          grep -q "hash_password" utils/auth_helpers.py && echo "PASS: hash_password" || (echo "FAIL: hash_password" && exit 1)
-          grep -q "generate_token" utils/auth_helpers.py && echo "PASS: jwt" || (echo "FAIL: jwt" && exit 1)
-          grep -q "role_required" utils/auth_helpers.py && echo "PASS: roles" || (echo "FAIL: roles" && exit 1)
+          grep -q "hash_password" utils/auth_helpers.py || { echo "FAIL: hash_password"; exit 1; }
+          grep -q "generate_token" utils/auth_helpers.py || { echo "FAIL: generate_token"; exit 1; }
+          grep -q "role_required" utils/auth_helpers.py || { echo "FAIL: role_required"; exit 1; }
+          echo "PASS: security helpers"
 
       - name: Check accessibility
         run: |
-          grep -q "accessibility" utils/accessibility.py && echo "PASS: accessibility" || (echo "FAIL: accessibility" && exit 1)
+          grep -q "accessibility" utils/accessibility.py || { echo "FAIL: accessibility"; exit 1; }
+          echo "PASS: accessibility"
 
       - name: Syntax check
         run: python -m py_compile app.py config.py models.py routes/*.py utils/*.py
